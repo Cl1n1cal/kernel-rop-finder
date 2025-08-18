@@ -1,5 +1,8 @@
 # Prerequisites
 *.d
+vmlinux
+text_section.bin
+
 
 # Object files
 *.o
