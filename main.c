@@ -54,7 +54,6 @@ int main(int argc, char **argv)
     }
 
     uint64_t text_offset = 0;
-    uint64_t text_size = 0;
     uint64_t base_addr = 0xffffffff81000000; // kernel .text virtual base (update this!)
 
     Elf_Scn *scn = NULL;
@@ -73,7 +72,6 @@ int main(int argc, char **argv)
             printf("    Offset: 0x%lx\n", (long)shdr.sh_offset);
             printf("    Size  : 0x%lx (%lu bytes)\n", (long)shdr.sh_size, (unsigned long)shdr.sh_size);
             text_offset = shdr.sh_offset;
-            text_size = shdr.sh_size;
         }
 
     }
@@ -84,6 +82,7 @@ int main(int argc, char **argv)
     // Allocate memory for .text parsing
 
     void *mem = malloc(PAGE_SIZE);
+    void *tracker = mem;
     if (!mem) {
         perror("malloc");
         exit(1);
@@ -94,8 +93,6 @@ int main(int argc, char **argv)
     free(mem);
     exit(1);
     }
-
-
 
     read(fd, mem, 0x1000);
     csh handle;
@@ -109,17 +106,25 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    count = cs_disasm(handle, mem, 25, base_addr, 3, &insn);
-    size_t j;
-    for (j = 0; j < count; j++) {
-        if (j == 0) {
-            printf("0x%"PRIx64":\t%s %s ;", insn[j].address, insn[j].mnemonic, insn[j].op_str);
-        } else {
-            printf(" %s %s ;", insn[j].mnemonic, insn[j].op_str);
+    size_t acc = 0;
+    while (acc < PAGE_SIZE - 0x100) {
+        count = cs_disasm(handle, tracker, 15*5, base_addr + acc, 5, &insn); // max instr. length is 15 bytes
+        size_t j;
+        for (j = 0; j < count; j++) {
+            if (j == 0) {
+                printf("0x%"PRIx64":\t%s %s ;", insn[j].address, insn[j].mnemonic, insn[j].op_str);
+            } else {
+                printf(" %s %s ;", insn[j].mnemonic, insn[j].op_str);
+            }
         }
+        puts("");
+
+        tracker += insn->size; // increment the tracker the amount of bytes interpreted as instr.
+        acc += insn->size; // increment the accumulator to track how far we are in the page
+
+        cs_free(insn, count);
     }
-    puts("");
-    cs_free(insn, count);
+
 
     /*
 
