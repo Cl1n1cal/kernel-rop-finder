@@ -2,6 +2,7 @@
 *.d
 vmlinux
 text_section.bin
+.gdb_history
 
 
 # Object files
