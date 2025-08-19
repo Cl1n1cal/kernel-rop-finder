@@ -12,9 +12,9 @@
 #define PAGE_SIZE 0x1000
 
 typedef struct {
-    uint64_t address;   // kernel address of the instruction
-    uint8_t size;       // size of the instruction, 1-15 bytes 
-    cs_insn *capstone_insn; 
+    uint64_t address;       // kernel address of the instruction
+    uint8_t size;           // size of the instruction, 1-15 bytes 
+    cs_insn capstone_insn;  // actual memory of an instruction
 } instr_t;
 
 
@@ -105,6 +105,9 @@ int main(int argc, char **argv)
     cs_insn *insn;
     size_t count;
 
+    // Allocate memory for 1000 instructions
+    instr_t *instructions = (instr_t *) calloc(1000, sizeof(instr_t));
+
 
     // Initialize Capstone - x86 64-bit mode
     if (cs_open(CS_ARCH_X86, CS_MODE_64, &handle) != CS_ERR_OK) {
@@ -116,6 +119,7 @@ int main(int argc, char **argv)
     while (acc < PAGE_SIZE - 0x100) {
         count = cs_disasm(handle, tracker, 15, base_addr + acc, 1, &insn); // max instr. length is 15 bytes, take one instr. at a time
 
+        // TODO: Copy the instruction data to a struct in the struct array of instruction
 
         tracker += insn->size; // increment the tracker the amount of bytes interpreted as instr.
         acc += insn->size; // increment the accumulator to track how far we are in the page
