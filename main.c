@@ -11,6 +11,13 @@
 
 #define PAGE_SIZE 0x1000
 
+typedef struct {
+    uint64_t address;   // kernel address of the instruction
+    uint8_t size;       // size of the instruction, 1-15 bytes 
+    cs_insn *capstone_insn; 
+
+} instr_t;
+
 
 int main(int argc, char **argv)
 {
@@ -89,9 +96,9 @@ int main(int argc, char **argv)
     }
 
     if (lseek(fd, text_offset, SEEK_SET) == (off_t) -1) {
-    perror("lseek");
-    free(mem);
-    exit(1);
+        perror("lseek");
+        free(mem);
+        exit(1);
     }
 
     read(fd, mem, 0x1000);
@@ -108,16 +115,8 @@ int main(int argc, char **argv)
 
     size_t acc = 0;
     while (acc < PAGE_SIZE - 0x100) {
-        count = cs_disasm(handle, tracker, 15*5, base_addr + acc, 5, &insn); // max instr. length is 15 bytes
-        size_t j;
-        for (j = 0; j < count; j++) {
-            if (j == 0) {
-                printf("0x%"PRIx64":\t%s %s ;", insn[j].address, insn[j].mnemonic, insn[j].op_str);
-            } else {
-                printf(" %s %s ;", insn[j].mnemonic, insn[j].op_str);
-            }
-        }
-        puts("");
+        count = cs_disasm(handle, tracker, 15, base_addr + acc, 1, &insn); // max instr. length is 15 bytes, take one instr. at a time
+
 
         tracker += insn->size; // increment the tracker the amount of bytes interpreted as instr.
         acc += insn->size; // increment the accumulator to track how far we are in the page
@@ -127,6 +126,12 @@ int main(int argc, char **argv)
 
 
     /*
+    //something more
+
+        for (j = 0; j < count; j++) {
+            if (j == 0) {
+                printf("0x%"PRIx64":\t%s %s ;", insn[j].address, insn[j].mnemonic, insn[j].op_str);
+        }
 
 
 
