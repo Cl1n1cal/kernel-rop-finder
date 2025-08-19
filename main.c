@@ -15,7 +15,6 @@ typedef struct {
     uint64_t address;   // kernel address of the instruction
     uint8_t size;       // size of the instruction, 1-15 bytes 
     cs_insn *capstone_insn; 
-
 } instr_t;
 
 
