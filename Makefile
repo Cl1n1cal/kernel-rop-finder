@@ -1,5 +1,3 @@
-# Makefile
-
 # Compiler
 CC = gcc
 
@@ -7,17 +5,25 @@ CC = gcc
 SRC = main.c
 OUT = kernel-rop-finder
 
-# Compiler flags
+# Common compiler flags
 CFLAGS = -Wall
 
-LDFLAGS = -lcapstone -lelf
+# Shared dynamic linker flags
+LDLIBS = -lcapstone -lelf
 
-# Default target
+# Static linker flags
+STATIC_LDLIBS = -static -lcapstone -lelf -lz -lzstd
+
+# Default target: dynamic build
 all: $(OUT)
 
-# Linking target
+# Dynamic build
 $(OUT): $(SRC)
-	$(CC) $(CFLAGS) -o $(OUT) $(SRC) $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $(OUT) $(SRC) $(LDLIBS)
+
+# Static build
+static:
+	$(CC) $(CFLAGS) -o $(OUT) $(SRC) $(STATIC_LDLIBS)
 
 # Clean target
 clean:

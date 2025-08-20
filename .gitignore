@@ -2,6 +2,7 @@
 *.d
 vmlinux
 text_section.bin
+kernel-rop-finder
 .gdb_history
 
 
