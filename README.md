@@ -3,6 +3,9 @@ This tool can find ret gadgets with up to 4 preceeding assembly instructions bef
 It is currently being developed for Linux x86-64 and only tested on the Ubuntu 24 LTS kernel.<br>
 If you encounter an error or bug, please do notify me.
 
+### Install
+Clone the repo and compile the code yourself or go to the releases page, where there will be precomiled binaries.
+
 ### Usage
 ```
 ./kernel-rop-finder vmlinux
