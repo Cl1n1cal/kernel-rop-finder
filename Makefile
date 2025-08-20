@@ -4,6 +4,7 @@ CC = gcc
 # Source and target
 SRC = main.c
 OUT = kernel-rop-finder
+STATIC-OUT = kernel-rop-finder-static
 
 # Common compiler flags
 CFLAGS = -Wall
@@ -23,7 +24,7 @@ $(OUT): $(SRC)
 
 # Static build
 static:
-	$(CC) $(CFLAGS) -o $(OUT) $(SRC) $(STATIC_LDLIBS)
+	$(CC) $(CFLAGS) -o $(STATIC-OUT) $(SRC) $(STATIC_LDLIBS)
 
 # Clean target
 clean:

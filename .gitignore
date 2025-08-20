@@ -3,6 +3,7 @@
 vmlinux
 text_section.bin
 kernel-rop-finder
+kernel-rop-finder-static
 .gdb_history
 
 
